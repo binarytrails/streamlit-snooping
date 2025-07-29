@@ -16,7 +16,14 @@ if st.button("Fetch"):
                 if (!resBox) return;  // safety check
                 resBox.textContent = "⏳ Fetching from: {url}";
                 try {{
-                    const response = await fetch("{url}");
+                    const response = await fetch("{url}", {{
+                        method: "GET",
+                        mode: "cors",
+                        redirect: "follow",
+                        headers: {{
+                            "Content-Type": "application/json"
+                        }}
+                    }});
                     const data = await response.text();
                     resBox.textContent = "✅ Response from {url}:" + "\\n\\n" + data;
                 }} catch (err) {{
