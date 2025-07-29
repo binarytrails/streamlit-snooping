@@ -1,53 +1,30 @@
-# app.py
 import streamlit as st
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import streamlit.components.v1 as components
 
-def get_page_info(url):
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-gpu")
-    options.add_argument("--disable-software-rasterizer")
-    options.add_argument("--disable-extensions")
+st.title("🕷️ Streamlit Snooping")
 
-    service = Service("/usr/bin/chromedriver")
-    driver = webdriver.Chrome(service=service, options=options)
-
-    try:
-        driver.get(url)
-
-        WebDriverWait(driver, 15).until(
-            EC.presence_of_element_located((By.TAG_NAME, "section"))
-        )
-
-        title = driver.title
-        source = driver.page_source
-        return title, source
-
-    except Exception as e:
-        return f"[!] Error: {e}", ""
-
-    finally:
-        driver.quit()
-
-
-st.title("🕷️ Selenium URL Loader")
-
-url = st.text_input("Enter a URL to load:", placeholder="https://example.com")
+url = st.text_input("Enter the Streamlit app URL", "https://your-react-app.com/api/test")
 
 if st.button("Fetch"):
     if url:
-        title, source = get_page_info(url)
-        st.subheader("Page Title:")
-        st.write(title)
-        st.subheader("Page Source Snippet:")
-        st.code(source)
+        st.markdown("### JavaScript is now fetching this from your browser:")
+
+        components.html(f"""
+            <script>
+            async function fetchFromBrowser() {{
+                const resBox = document.getElementById("result");
+                resBox.textContent = "⏳ Fetching from: {url}";
+                try {{
+                    const response = await fetch("{url}");
+                    const data = await response.text();
+                    resBox.textContent = "✅ Response from {url}:" + "\\n\\n" + data;
+                }} catch (err) {{
+                    resBox.textContent = "❌ Error: " + err;
+                }}
+            }}
+            fetchFromBrowser();
+            </script>
+            <pre id="result" style="white-space: pre-wrap; font-size: 0.85em;">Waiting for browser to fetch...</pre>
+        """, height=400)
     else:
         st.warning("Please enter a valid URL.")
-
