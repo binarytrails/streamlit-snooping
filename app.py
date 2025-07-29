@@ -3,11 +3,18 @@ import streamlit.components.v1 as components
 
 st.title("🕷️ Streamlit Snooping")
 
-url = st.text_input("Enter the Streamlit app URL", "https://your-react-app.com/api/test")
+url = st.text_input("Enter the target URL", "https://your-react-app.com/api/test")
+
+# Dynamic Content-Type selection
+content_type = st.selectbox(
+    "Select Content-Type for the request header",
+    options=["application/json", "text/plain", "application/x-www-form-urlencoded"],
+    index=0
+)
 
 if st.button("Fetch"):
     if url:
-        st.markdown("### JavaScript is now fetching this from your browser:")
+        st.markdown(f"### JavaScript is now fetching this from your browser with `{content_type}`")
 
         components.html(f"""
             <script>
@@ -19,8 +26,10 @@ if st.button("Fetch"):
                     const response = await fetch("{url}", {{
                         method: "GET",
                         mode: "cors",
-                        redirect: "follow"
-                        // no custom headers here
+                        redirect: "follow",
+                        headers: {{
+                            "Content-Type": "{content_type}"
+                        }}
                     }});
                     const data = await response.text();
                     resBox.textContent = "✅ Response from {url}:" + "\\n\\n" + data;
@@ -34,3 +43,4 @@ if st.button("Fetch"):
         """, height=400)
     else:
         st.warning("Please enter a valid URL.")
+
