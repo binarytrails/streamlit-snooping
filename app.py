@@ -27,7 +27,7 @@ def get_page_info(url):
         )
 
         title = driver.title
-        source = driver.page_source[:1000]
+        source = driver.page_source
         return title, source
 
     except Exception as e:
