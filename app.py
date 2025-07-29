@@ -13,16 +13,14 @@ if st.button("Fetch"):
             <script>
             async function fetchFromBrowser() {{
                 const resBox = document.getElementById("result");
-                if (!resBox) return;  // safety check
+                if (!resBox) return;
                 resBox.textContent = "⏳ Fetching from: {url}";
                 try {{
                     const response = await fetch("{url}", {{
                         method: "GET",
                         mode: "cors",
-                        redirect: "follow",
-                        headers: {{
-                            "Content-Type": "application/json"
-                        }}
+                        redirect: "follow"
+                        // no custom headers here
                     }});
                     const data = await response.text();
                     resBox.textContent = "✅ Response from {url}:" + "\\n\\n" + data;
@@ -36,4 +34,3 @@ if st.button("Fetch"):
         """, height=400)
     else:
         st.warning("Please enter a valid URL.")
-
