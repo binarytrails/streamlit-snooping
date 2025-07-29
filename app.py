@@ -13,6 +13,7 @@ if st.button("Fetch"):
             <script>
             async function fetchFromBrowser() {{
                 const resBox = document.getElementById("result");
+                if (!resBox) return;  // safety check
                 resBox.textContent = "⏳ Fetching from: {url}";
                 try {{
                     const response = await fetch("{url}");
@@ -22,9 +23,10 @@ if st.button("Fetch"):
                     resBox.textContent = "❌ Error: " + err;
                 }}
             }}
-            fetchFromBrowser();
+            window.addEventListener('DOMContentLoaded', fetchFromBrowser);
             </script>
             <pre id="result" style="white-space: pre-wrap; font-size: 0.85em;">Waiting for browser to fetch...</pre>
         """, height=400)
     else:
         st.warning("Please enter a valid URL.")
+
