@@ -8,39 +8,56 @@ url = st.text_input("Enter the target URL", "https://your-react-app.com/api/test
 # Dynamic Content-Type selection
 content_type = st.selectbox(
     "Select Content-Type for the request header",
-    options=["application/json", "text/plain", "application/x-www-form-urlencoded"],
+    options=["text/plain", "application/json", "application/x-www-form-urlencoded"],
     index=0
 )
 
 if st.button("Fetch"):
     if url:
-        st.markdown(f"### JavaScript is now fetching this from your browser with `{content_type}`")
+        st.markdown("### Embedded Page Render:")
 
         components.html(f"""
-            <script>
-            async function fetchFromBrowser() {{
-                const resBox = document.getElementById("result");
-                if (!resBox) return;
-                resBox.textContent = "⏳ Fetching from: {url}";
+            <div style="padding: 1rem; background-color: #f9f9f9; border-radius: 8px;">
+              <iframe
+                id="targetFrame"
+                src="{url}"
+                width="100%"
+                onload="resizeIframe(this)"
+                frameborder="0"
+                style="min-height: 800px; width: 100%; border: 1px solid #ccc; border-radius: 6px;"
+                sandbox=""
+                onerror="document.getElementById('fallback').style.display = 'block';"
+              ></iframe>
+
+              <div id="fallback" style="display: none; margin-top: 1em;">
+                <p><b>⚠️ Failed to load via iframe — showing raw HTML instead.</b></p>
+                <script>
+                fetch("{url}")
+                  .then(res => res.text())
+                  .then(html => {{
+                    document.getElementById("fallback").innerHTML += `<pre style='white-space: pre-wrap; font-size: 0.85em; padding: 1em; background: #fff; border: 1px solid #ddd;'>` + html + `</pre>`;
+                  }})
+                  .catch(err => {{
+                    document.getElementById("fallback").innerHTML += "<pre style='color:red;'>Error: " + err + "</pre>";
+                  }});
+                </script>
+              </div>
+
+              <script>
+              function resizeIframe(iframe) {{
+                // Try to auto-grow to content height (works only for same-origin if allowed)
                 try {{
-                    const response = await fetch("{url}", {{
-                        method: "GET",
-                        mode: "cors",
-                        redirect: "follow",
-                        headers: {{
-                            "Content-Type": "{content_type}"
-                        }}
-                    }});
-                    const data = await response.text();
-                    resBox.textContent = "✅ Response from {url}:" + "\\n\\n" + data;
-                }} catch (err) {{
-                    resBox.textContent = "❌ Error: " + err;
+                  const doc = iframe.contentDocument || iframe.contentWindow.document;
+                  const height = doc.body.scrollHeight;
+                  iframe.style.height = height + "px";
+                }} catch (e) {{
+                  // Cross-origin frames can't be resized reliably
+                  iframe.style.height = "1200px";
                 }}
-            }}
-            window.addEventListener('DOMContentLoaded', fetchFromBrowser);
-            </script>
-            <pre id="result" style="white-space: pre-wrap; font-size: 0.85em;">Waiting for browser to fetch...</pre>
-        """, height=400)
+              }}
+              </script>
+            </div>
+        """, height=1500)
     else:
         st.warning("Please enter a valid URL.")
 
