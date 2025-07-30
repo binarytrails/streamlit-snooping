@@ -25,7 +25,7 @@ if st.button("Fetch"):
                 onload="resizeIframe(this)"
                 frameborder="0"
                 style="min-height: 800px; width: 100%; border: 1px solid #ccc; border-radius: 6px;"
-                sandbox=""
+                sandbox="allow-scripts allow-same-origin allow-forms"
                 onerror="document.getElementById('fallback').style.display = 'block';"
               ></iframe>
 
