@@ -1,4 +1,4 @@
-# streamlit-snooping
+# 🕷️ streamlit-snooping
 
 drop cors before browsing to streamlit url
 ```
